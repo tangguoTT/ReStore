@@ -19,8 +19,17 @@ public class Program
         {
              opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
         });
-        builder.Services.AddCors();
-
+        // 注册 CORS（跨源资源共享）服务到依赖注入容器中，允许配置跨域请求的规则。
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowLocalhost3000", policy =>
+            {
+                policy.WithOrigins("http://localhost:3000") // 允许的前端地址
+                    .AllowAnyHeader()                     // 允许所有请求头
+                    .AllowAnyMethod();                    // 允许所有 HTTP 方法
+            });
+        });
+        
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -32,10 +41,7 @@ public class Program
          
         //app.UseHttpsRedirection();
 
-        app.UseCors(opt =>
-        {
-            opt.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
-        });
+        app.UseCors("AllowLocalhost3000");
         
         app.UseAuthorization();
         
