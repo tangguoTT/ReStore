@@ -1,39 +1,40 @@
-import {useEffect, useState} from "react";
-import {Product} from "../models/Product.ts";
+import Catalog from "../../features/catalog/Catalog.tsx";
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
+import Header from "./Header.tsx";
+import {Container, createTheme, CssBaseline, ThemeProvider} from "@mui/material";
+import {useState} from "react";
+
 
 function App() {
-    const [products, setProducts] = useState<Product[] >([]);
-
-    useEffect(() => {
-        fetch('http://localhost:5202/products')
-            .then(res => res.json())
-            .then(data => setProducts(data))
-    }, [])
-    function addProduct() {
-        // setProducts([...products, {id: '1003', name: 'product3', price: 300.00}]);
-        setProducts(preState =>
-            [...preState, {
-                id: preState.length + 101,
-                name: 'product' + (preState.length + 1),
-                price: (preState.length * 100) + 100, 
-                brand: 'some brand',
-                description: 'some description',
-                pictureUrl: 'http://picsum.photos/200'
-            }])
+    
+    const [darkMode, setDarkMode] = useState<boolean>(false);
+    const paletteType = darkMode ? 'dark' : 'light';
+    const theme = createTheme({
+        palette: {
+            mode: paletteType,
+            background: {
+                default: paletteType === 'light' ? '#eaeaea' : '#121212',
+            }
+        }
+    });
+     
+    function handleThemeChange() {
+        setDarkMode(!darkMode);
     }
-
+    
     return (
-        <div>
-            <h1>Re-Store</h1>
-            <ul>
-                {products.map(product => (
-                    <li key={product.id}>
-                        {product.name}: {product.price}
-                    </li>
-                ))}
-            </ul>
-            <button onClick={() => addProduct()}>Add Product</button>
-        </div>
+        <>
+            <ThemeProvider theme={theme}>
+                <CssBaseline/>
+                <Header darkMode={darkMode} handleThemeChange={handleThemeChange} />
+                <Container>
+                    <Catalog />
+                </Container>
+            </ThemeProvider>
+        </>
     )
 }
 
