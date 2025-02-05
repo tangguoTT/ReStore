@@ -2,7 +2,9 @@ import {Divider, Grid2, Table, TableBody, TableCell, TableContainer, TableRow, T
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {Product} from "../../app/models/Product.ts";
-import axios from "axios";
+import agent from "../../app/api/agent.ts";
+import NotFound from "../../app/errors/NotFound.tsx";
+import LoadingComponent from "../../app/layout/LoadingComponent.tsx";
 
 function ProductDetails() {
     
@@ -11,18 +13,18 @@ function ProductDetails() {
     const [loading, setLoading] = useState<boolean>(true);
     
     useEffect(() => {
-        axios.get(`http://localhost:5202/products/${id}`)
-            .then(response => setProduct(response.data))
+        id && agent.Catalog.details(parseInt(id))
+            .then(product => setProduct(product))
             .catch(error => console.log(error))
             .finally(() => setLoading(false));
     },[id])
     
     if (loading) {
-        return <h3>Loading...</h3>
+        return <LoadingComponent message='Loading Product...' />; 
     }
     
     if (!product) {
-        return <h3>Product Not Found!</h3>
+        return <NotFound />
     }
     
     return ( 
